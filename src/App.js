@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Monitor, 
   Plus, 
@@ -20,7 +20,9 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  Wifi,
+  WifiOff
 } from 'lucide-react';
 
 const API_URL = 'http://localhost:5000/api/servers';
@@ -30,6 +32,7 @@ const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1024);
   const [servers, setServers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPinging, setIsPinging] = useState(false);
   const [error, setError] = useState(null);
   
   const [activeServer, setActiveServer] = useState(null);
@@ -45,18 +48,38 @@ const App = () => {
     password: '' 
   });
 
-  // 1. Ambil Data dari MySQL saat komponen dimuat
+  // 1. Fungsi untuk Ping/Cek Status Server
+  const checkServerStatus = useCallback(async () => {
+    if (servers.length === 0) return;
+    setIsPinging(true);
+    try {
+      // Kita asumsikan ada endpoint /status di backend
+      const response = await fetch(`${API_URL}/status`);
+      if (response.ok) {
+        const statuses = await response.json(); // Format: [{id: 1, status: 'online'}, ...]
+        setServers(prev => prev.map(s => {
+          const update = statuses.find(u => u.id === s.id);
+          return update ? { ...s, status: update.status } : s;
+        }));
+      }
+    } catch (err) {
+      console.error("Gagal melakukan ping ke server:", err);
+    } finally {
+      setIsPinging(false);
+    }
+  }, [servers.length]);
+
+  // 2. Ambil Data Awal dari MySQL
   const fetchServers = async () => {
     setIsLoading(true);
     try {
       const response = await fetch(API_URL);
       if (!response.ok) throw new Error('Gagal mengambil data dari server');
       const data = await response.json();
-      setServers(data);
+      setServers(data.map(s => ({ ...s, status: s.status || 'unknown' })));
       setError(null);
     } catch (err) {
       setError('Koneksi API Gagal. Pastikan Backend & MySQL sudah berjalan.');
-      console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -64,7 +87,17 @@ const App = () => {
 
   useEffect(() => {
     fetchServers();
-    
+  }, []);
+
+  // 3. Polling Status setiap 30 detik
+  useEffect(() => {
+    const timer = setInterval(() => {
+      checkServerStatus();
+    }, 30000);
+    return () => clearInterval(timer);
+  }, [checkServerStatus]);
+
+  useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 1024) setIsSidebarOpen(false);
       else if (!activeServer) setIsSidebarOpen(true);
@@ -73,7 +106,6 @@ const App = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, [activeServer]);
 
-  // 2. Tambah Server ke MySQL
   const handleAddServer = async (e) => {
     e.preventDefault();
     try {
@@ -83,9 +115,8 @@ const App = () => {
         body: JSON.stringify(newServer)
       });
       if (!response.ok) throw new Error('Gagal menyimpan server');
-      
       const savedServer = await response.json();
-      setServers([...servers, savedServer]);
+      setServers([...servers, { ...savedServer, status: 'unknown' }]);
       setIsAddModalOpen(false);
       setNewServer({ name: '', host: '', proxy_port: '6080', password: '' });
     } catch (err) {
@@ -93,14 +124,11 @@ const App = () => {
     }
   };
 
-  // 3. Hapus Server dari MySQL
   const deleteServer = async (id) => {
     if (!window.confirm('Hapus unit HMI ini?')) return;
-    
     try {
       const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error('Gagal menghapus server');
-      
       setServers(servers.filter(s => s.id !== id));
       if (activeServer?.id === id) setActiveServer(null);
     } catch (err) {
@@ -188,6 +216,17 @@ const App = () => {
               />
             </div>
 
+            <div className="flex items-center justify-between mb-3 px-2">
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">HMI Unit</span>
+              <button 
+                onClick={checkServerStatus} 
+                className={`p-1 hover:bg-blue-500/10 rounded-full transition-all ${isPinging ? 'animate-spin text-blue-500' : 'text-slate-500'}`}
+                title="Refresh Status"
+              >
+                <RefreshCw size={14} />
+              </button>
+            </div>
+
             {error && (
               <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-lg text-[10px] text-rose-500 flex items-start gap-2">
                 <AlertCircle size={14} className="shrink-0" />
@@ -211,11 +250,18 @@ const App = () => {
                     }`}
                   >
                     <div className="flex items-center gap-3 truncate">
-                      <div className={`shrink-0 w-2 h-2 rounded-full ${server.status === 'online' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-rose-500'}`} />
+                      <div className={`shrink-0 w-2 h-2 rounded-full transition-all duration-500 ${
+                        server.status === 'online' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 
+                        server.status === 'offline' ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]' :
+                        'bg-slate-500'
+                      }`} />
                       <div className="truncate">
-                        <p className="text-sm font-medium truncate">{server.name}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-medium truncate">{server.name}</p>
+                          {server.status === 'offline' && <WifiOff size={10} className="text-rose-400" />}
+                        </div>
                         <p className={`text-[10px] truncate ${activeServer?.id === server.id ? 'text-blue-100' : 'opacity-60'}`}>
-                          {server.host}:{server.proxy_port}
+                          {server.host}
                         </p>
                       </div>
                     </div>
@@ -262,9 +308,12 @@ const App = () => {
             <div className="flex flex-col min-w-0">
               {activeServer ? (
                 <div className="animate-in fade-in slide-in-from-left-2 duration-300">
-                  <h2 className="text-sm font-bold truncate leading-none">{activeServer.name}</h2>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-sm font-bold truncate leading-none">{activeServer.name}</h2>
+                    <div className={`w-1.5 h-1.5 rounded-full ${activeServer.status === 'online' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                  </div>
                   <p className="text-[10px] text-slate-500 truncate uppercase tracking-tighter mt-1">
-                    {activeServer.host} • PT KARYAINDAH ALAM SEJAHTERA
+                    {activeServer.host} • PORT {activeServer.proxy_port}
                   </p>
                 </div>
               ) : (
@@ -299,16 +348,26 @@ const App = () => {
           ) : (
             <div className="w-full h-full flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-700">
               <div className={`${styles.card} p-10 md:p-14 rounded-[3rem] w-full max-w-lg border ${styles.border} flex flex-col items-center text-center transition-all duration-500 shadow-2xl relative overflow-hidden group`}>
-                <div className="bg-blue-600/10 w-24 h-24 rounded-[2.5rem] flex items-center justify-center mb-10 group-hover:scale-110 transition-transform duration-500">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-50"></div>
+                <div className="bg-blue-600/10 w-24 h-24 rounded-[2.5rem] flex items-center justify-center mb-10 group-hover:scale-110 transition-transform duration-500 shadow-inner">
                     <Server size={44} className="text-blue-500" />
                 </div>
                 <h2 className="text-xl md:text-2xl font-black mb-2 uppercase tracking-tighter text-blue-600">PT KARYAINDAH ALAM SEJAHTERA</h2>
-                <h3 className="text-[11px] font-bold text-slate-500 mb-8 uppercase tracking-[0.3em] opacity-80">VNC Database Connected</h3>
-                <p className="text-xs md:text-sm text-slate-500 mb-12 px-6 leading-relaxed max-w-xs mx-auto">
-                    Seluruh data unit HMI sekarang dikelola melalui MySQL. Perubahan di sini akan tersimpan secara permanen.
-                </p>
+                <h3 className="text-[11px] font-bold text-slate-500 mb-8 uppercase tracking-[0.3em] opacity-80">Monitoring & Control Center</h3>
+                
+                <div className="grid grid-cols-2 gap-4 w-full mb-8">
+                  <div className="p-4 bg-slate-800/30 rounded-2xl border border-slate-700/50">
+                    <p className="text-[10px] text-slate-500 uppercase font-bold mb-1">Total Unit</p>
+                    <p className="text-2xl font-bold">{servers.length}</p>
+                  </div>
+                  <div className="p-4 bg-emerald-500/5 rounded-2xl border border-emerald-500/10">
+                    <p className="text-[10px] text-emerald-500/70 uppercase font-bold mb-1">Online</p>
+                    <p className="text-2xl font-bold text-emerald-500">{servers.filter(s => s.status === 'online').length}</p>
+                  </div>
+                </div>
+
                 <button onClick={fetchServers} className="bg-slate-800 hover:bg-slate-700 text-[10px] font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all active:scale-95">
-                    <RefreshCw size={12} className={isLoading ? 'animate-spin' : ''} /> REFRESH DATABASE
+                    <RefreshCw size={12} className={isLoading ? 'animate-spin' : ''} /> SYNC DATABASE
                 </button>
               </div>
             </div>

@@ -118,4 +118,29 @@ app.get('/api/servers/status', authenticateToken, async (req, res) => {
     });
 });
 
+// Endpoint: Ganti Password User
+app.put('/api/users/change-password', authenticateToken, async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
+    const userId = req.user.id; // Diambil dari token JWT
+
+    db.query('SELECT password FROM users WHERE id = ?', [userId], async (err, results) => {
+        if (err) return res.status(500).json(err);
+        
+        const user = results[0];
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Password lama salah' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+
+        db.query('UPDATE users SET password = ? WHERE id = ?', [hashedNewPassword, userId], (err) => {
+            if (err) return res.status(500).json(err);
+            res.json({ message: 'Password berhasil diperbarui' });
+        });
+    });
+});
+
 app.listen(5000, () => console.log('API running on http://localhost:5000'));

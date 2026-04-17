@@ -1,70 +1,104 @@
-# Getting Started with Create React App
+# VNC Remote Dashboard
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Dashboard React untuk monitoring dan remote HMI/PLC via noVNC dengan tampilan sidebar, daftar unit, dan area koneksi real-time.
 
-## Available Scripts
+## Fitur
 
-In the project directory, you can run:
+- Daftar server HMI (tambah, pilih, hapus).
+- Pencarian cepat unit dari sidebar.
+- Embed noVNC melalui iframe (`/novnc/vnc.html`).
+- Tombol reconnect dan fullscreen untuk sesi aktif.
+- Dukungan tema terang/gelap.
+- UI responsif untuk desktop dan mobile.
 
-### `npm start`
+## Arsitektur Singkat
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- Frontend: React (Create React App) di port `3000`.
+- noVNC: asset statis berada di `public/novnc`.
+- Proxy WebSocket ke VNC: Node.js (`server.js`) di port `6080`.
+- VNC target default: `192.168.47.42:5900` (diatur di `server.js`).
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Alur koneksi:
 
-### `npm test`
+1. User memilih unit di dashboard.
+2. Frontend membuka `iframe` noVNC dengan parameter koneksi.
+3. noVNC terhubung ke WebSocket proxy (`ws://<host>:6080/websockify`).
+4. Proxy meneruskan data ke VNC server TCP (`5900`).
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Prasyarat
 
-### `npm run build`
+- Node.js 18+ (disarankan LTS terbaru).
+- npm 9+.
+- Akses jaringan ke VNC server target.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Instalasi
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+npm install
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Menjalankan Proyek
 
-### `npm run eject`
+Jalankan 2 proses terpisah:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+1. Jalankan React app:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+npm start
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+2. Jalankan proxy VNC:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+node server.js
+```
 
-## Learn More
+Buka aplikasi di `http://localhost:3000`.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Konfigurasi Koneksi
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 1) Target VNC di proxy
 
-### Code Splitting
+Ubah host/port VNC asli di `server.js`:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```js
+vnc.connect(5900, '192.168.47.42', () => {
+  console.log('Terhubung ke VNC Server (192.168.47.42:5900)');
+});
+```
 
-### Analyzing the Bundle Size
+### 2) Port WebSocket proxy
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Default port proxy adalah `6080`:
 
-### Making a Progressive Web App
+```js
+const wss = new WebSocket.Server({ port: 6080 });
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Pastikan nilai `proxy_port` unit di frontend sama dengan port proxy aktif.
 
-### Advanced Configuration
+## Script NPM
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+- `npm start` - Menjalankan React development server.
+- `npm run build` - Build production ke folder `build`.
+- `npm test` - Menjalankan test dengan react-scripts.
 
-### Deployment
+## Struktur File Utama
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+- `src/App.js` - UI dashboard, daftar unit, dan iframe noVNC.
+- `server.js` - WebSocket-to-TCP bridge untuk VNC.
+- `public/novnc` - Distribusi noVNC.
 
-### `npm run build` fails to minify
+## Catatan Keamanan
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Password VNC saat ini dikirim lewat query parameter iframe.
+- Hindari menyimpan kredensial produksi langsung di kode.
+- Disarankan menambahkan autentikasi aplikasi dan TLS/WSS untuk deployment.
+
+## Build Production
+
+```bash
+npm run build
+```
+
+Hasil build ada di folder `build`.

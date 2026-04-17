@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { 
-  Monitor, Plus, Trash2, Settings, RefreshCw, Search, Server, LogOut, Sun, Moon, 
-  Eye, EyeOff, Lock, Maximize2, Keyboard, Camera, X, PanelLeftClose, PanelLeftOpen, 
+import {
+  Monitor, Plus, Trash2, Settings, RefreshCw, Search, Server, LogOut, Sun, Moon,
+  Eye, EyeOff, Lock, Maximize2, Keyboard, Camera, X, PanelLeftClose, PanelLeftOpen,
   Loader2, AlertCircle, WifiOff, User, ShieldCheck, UserPlus, ArrowLeft, CheckCircle2
 } from 'lucide-react';
 
@@ -30,9 +30,9 @@ const AuthView = ({ theme, onLoginSuccess }) => {
         body: JSON.stringify(formData)
       });
       const data = await response.json();
-      
+
       if (!response.ok) throw new Error(data.message || 'Proses gagal');
-      
+
       if (authMode === 'login') {
         onLoginSuccess(data.token, data.username);
       } else {
@@ -61,11 +61,11 @@ const AuthView = ({ theme, onLoginSuccess }) => {
         <div className={`${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} border p-8 rounded-[2rem] shadow-2xl`}>
           <div className="flex justify-between items-center mb-8 border-b border-slate-800 pb-4">
             <h2 className="font-bold text-lg">{authMode === 'login' ? 'Login Operator' : 'Daftar Akun'}</h2>
-            <button 
-              onClick={() => { setAuthMode(authMode === 'login' ? 'register' : 'login'); setError(null); setSuccessMsg(null); }} 
+            <button
+              onClick={() => { setAuthMode(authMode === 'login' ? 'register' : 'login'); setError(null); setSuccessMsg(null); }}
               className="text-xs font-bold text-blue-500 hover:underline flex items-center gap-1"
             >
-              {authMode === 'login' ? <><UserPlus size={14}/> Buat Akun</> : <><ArrowLeft size={14}/> Kembali</>}
+              {authMode === 'login' ? <><UserPlus size={14} /> Buat Akun</> : <><ArrowLeft size={14} /> Kembali</>}
             </button>
           </div>
 
@@ -74,18 +74,18 @@ const AuthView = ({ theme, onLoginSuccess }) => {
               <label className="text-[10px] font-bold uppercase tracking-widest ml-1 opacity-60">Username</label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-                <input required className={`w-full pl-12 pr-4 py-4 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/50 transition-all ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'}`} placeholder="Username" value={formData.username} onChange={e => setFormData({...formData, username: e.target.value})} />
+                <input required className={`w-full pl-12 pr-4 py-4 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/50 transition-all ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'}`} placeholder="Username" value={formData.username} onChange={e => setFormData({ ...formData, username: e.target.value })} />
               </div>
             </div>
             <div className="space-y-2 text-left">
               <label className="text-[10px] font-bold uppercase tracking-widest ml-1 opacity-60">Password</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-                <input type="password" required className={`w-full pl-12 pr-4 py-4 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/50 transition-all ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'}`} placeholder="••••••••" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
+                <input type="password" required className={`w-full pl-12 pr-4 py-4 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/50 transition-all ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'}`} placeholder="••••••••" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} />
               </div>
             </div>
-            {error && <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-lg text-xs text-rose-500 flex gap-2"><AlertCircle size={14}/> {error}</div>}
-            {successMsg && <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-xs text-emerald-500 flex gap-2"><CheckCircle2 size={14}/> {successMsg}</div>}
+            {error && <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-lg text-xs text-rose-500 flex gap-2"><AlertCircle size={14} /> {error}</div>}
+            {successMsg && <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-xs text-emerald-500 flex gap-2"><CheckCircle2 size={14} /> {successMsg}</div>}
             <button disabled={isSubmitting} type="submit" className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">
               {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : (authMode === 'login' ? <ShieldCheck size={18} /> : <UserPlus size={18} />)}
               {isSubmitting ? 'Memproses...' : (authMode === 'login' ? 'MASUK KE DASHBOARD' : 'DAFTAR SEKARANG')}
@@ -100,9 +100,9 @@ const AuthView = ({ theme, onLoginSuccess }) => {
 // ==========================================
 // 2. KOMPONEN SIDEBAR
 // ==========================================
-const Sidebar = ({ 
-  theme, isOpen, setIsOpen, servers, isLoading, isPinging, error, searchQuery, setSearchQuery, 
-  activeServer, setActiveServer, onAddClick, onDeleteServer, checkStatus, username, onLogout 
+const Sidebar = ({
+  theme, isOpen, setIsOpen, servers, isLoading, isPinging, error, searchQuery, setSearchQuery,
+  activeServer, setActiveServer, onAddClick, onDeleteServer, checkStatus, username, onLogout
 }) => {
   const styles = {
     sidebar: theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200',
@@ -112,7 +112,7 @@ const Sidebar = ({
     border: theme === 'dark' ? 'border-slate-800' : 'border-slate-200',
   };
 
-  const filteredServers = useMemo(() => 
+  const filteredServers = useMemo(() =>
     servers.filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase())),
     [servers, searchQuery]
   );
@@ -121,9 +121,9 @@ const Sidebar = ({
     <aside className={`fixed lg:relative inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 ease-in-out border-r ${styles.sidebar} ${isOpen ? 'w-72 translate-x-0' : 'w-0 -translate-x-full lg:translate-x-0 lg:w-0 lg:border-none'}`}>
       <div className={`flex flex-col h-full w-72 transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <div className={`p-6 border-b ${styles.border} flex flex-col gap-2 relative`}>
-          <button onClick={() => setIsOpen(false)} className="absolute top-6 right-4 p-1 lg:hidden text-slate-400"><X size={20}/></button>
+          <button onClick={() => setIsOpen(false)} className="absolute top-6 right-4 p-1 lg:hidden text-slate-400"><X size={20} /></button>
           <div className="flex items-center gap-3">
-            <div className="bg-blue-600 p-2 rounded-lg text-white shadow-lg"><Monitor size={20}/></div>
+            <div className="bg-blue-600 p-2 rounded-lg text-white shadow-lg"><Monitor size={20} /></div>
             <h1 className="text-xl font-bold tracking-tight text-white">VNC Cloud</h1>
           </div>
           <p className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">PT KARYAINDAH ALAM SEJAHTERA</p>
@@ -131,33 +131,33 @@ const Sidebar = ({
 
         <div className="p-4 flex-1 overflow-y-auto">
           <div className="relative mb-6">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16}/>
-            <input type="text" placeholder="Cari unit..." className={`w-full ${styles.input} border-none rounded-lg py-2 pl-10 pr-4 text-sm outline-none`} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+            <input type="text" placeholder="Cari unit..." className={`w-full ${styles.input} border-none rounded-lg py-2 pl-10 pr-4 text-sm outline-none`} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
           </div>
 
           <div className="flex items-center justify-between mb-3 px-2">
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">HMI Units</span>
-            <button onClick={checkStatus} className={`p-1 hover:bg-blue-500/10 rounded-full transition-all ${isPinging ? 'animate-spin text-blue-500' : 'text-slate-500'}`}><RefreshCw size={14}/></button>
+            <button onClick={checkStatus} className={`p-1 hover:bg-blue-500/10 rounded-full transition-all ${isPinging ? 'animate-spin text-blue-500' : 'text-slate-500'}`}><RefreshCw size={14} /></button>
           </div>
 
           <nav className="space-y-1">
-            {isLoading ? <div className="flex flex-col items-center justify-center py-8 opacity-40"><Loader2 className="animate-spin mb-2" size={20}/><span className="text-xs">Loading...</span></div> :
+            {isLoading ? <div className="flex flex-col items-center justify-center py-8 opacity-40"><Loader2 className="animate-spin mb-2" size={20} /><span className="text-xs">Loading...</span></div> :
               filteredServers.map(server => (
                 <div key={server.id} onClick={() => setActiveServer(server)} className={`group p-3 rounded-xl cursor-pointer flex items-center justify-between transition-all ${activeServer?.id === server.id ? 'bg-blue-600 text-white shadow-md' : `${styles.hover} ${styles.textMuted} hover:text-slate-100`}`}>
                   <div className="flex items-center gap-3 truncate">
                     <div className={`shrink-0 w-2 h-2 rounded-full transition-all duration-500 ${server.status === 'online' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : server.status === 'offline' ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]' : 'bg-slate-500'}`} />
                     <div className="truncate"><p className="text-sm font-medium truncate">{server.name}</p><p className={`text-[10px] truncate ${activeServer?.id === server.id ? 'text-blue-100' : 'opacity-60'}`}>{server.host}</p></div>
                   </div>
-                  <button onClick={(e) => { e.stopPropagation(); onDeleteServer(server.id); }} className={`p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity ${activeServer?.id === server.id ? 'hover:bg-white/20 text-white' : 'hover:bg-rose-500/10 text-rose-500'}`}><Trash2 size={14}/></button>
+                  <button onClick={(e) => { e.stopPropagation(); onDeleteServer(server.id); }} className={`p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity ${activeServer?.id === server.id ? 'hover:bg-white/20 text-white' : 'hover:bg-rose-500/10 text-rose-500'}`}><Trash2 size={14} /></button>
                 </div>
               ))}
-            <button onClick={onAddClick} className={`w-full flex items-center justify-center gap-2 p-3 mt-4 text-[10px] font-bold border-2 border-dashed ${styles.border} rounded-xl ${styles.hover} text-slate-400 hover:text-blue-500 hover:border-blue-500/50 transition-all`}><Plus size={14}/> TAMBAH UNIT</button>
+            <button onClick={onAddClick} className={`w-full flex items-center justify-center gap-2 p-3 mt-4 text-[10px] font-bold border-2 border-dashed ${styles.border} rounded-xl ${styles.hover} text-slate-400 hover:text-blue-500 hover:border-blue-500/50 transition-all`}><Plus size={14} /> TAMBAH UNIT</button>
           </nav>
         </div>
 
         <div className={`p-4 border-t ${styles.border}`}>
           <div className="flex items-center gap-3 p-3 rounded-lg bg-blue-500/5 mb-2"><div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-xs uppercase">{username?.charAt(0)}</div><div className="flex flex-col"><span className="text-[10px] font-bold opacity-50 uppercase tracking-tighter">OPERATOR</span><span className="text-sm font-bold truncate">{username}</span></div></div>
-          <button onClick={onLogout} className={`w-full flex items-center gap-3 p-3 rounded-lg ${styles.hover} text-rose-500 transition-colors active:scale-95`}><LogOut size={18}/><span className="text-sm font-bold">Logout</span></button>
+          <button onClick={onLogout} className={`w-full flex items-center gap-3 p-3 rounded-lg ${styles.hover} text-rose-500 transition-colors active:scale-95`}><LogOut size={18} /><span className="text-sm font-bold">Logout</span></button>
         </div>
       </div>
     </aside>
@@ -181,16 +181,16 @@ const AddServerModal = ({ theme, isOpen, onClose, onSave }) => {
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
       <div className={`${styles.card} rounded-[2rem] w-full max-w-md shadow-2xl p-8 border animate-in slide-in-from-bottom-4 duration-300`}>
-          <h3 className="text-xl font-bold mb-8 flex items-center gap-3 text-blue-500"><div className="p-2 bg-blue-500/10 rounded-lg"><Plus size={20}/></div>Tambah HMI</h3>
-          <form onSubmit={(e) => { e.preventDefault(); onSave(formData); }} className="space-y-6 text-left">
-            <div className="space-y-2"><label className="text-[10px] font-bold opacity-70">Nama Unit</label><input required className={`w-full ${styles.input} border rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-blue-500/50 transition-all`} placeholder="Filling Line 1" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} /></div>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1 space-y-2"><label className="text-[10px] font-bold opacity-70">IP Address</label><input required className={`w-full ${styles.input} border rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-blue-500/50 transition-all`} placeholder="192.168.x.x" value={formData.host} onChange={(e) => setFormData({...formData, host: e.target.value})} /></div>
-              <div className="w-full sm:w-32 space-y-2"><label className="text-[10px] font-bold opacity-70">Port Proxy</label><input required className={`w-full ${styles.input} border rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-blue-500/50 transition-all`} value={formData.proxy_port} onChange={(e) => setFormData({...formData, proxy_port: e.target.value})} /></div>
-            </div>
-            <div className="space-y-2"><label className="text-[10px] font-bold opacity-70">VNC Password</label><div className="relative"><input type={showPass ? "text" : "password"} className={`w-full ${styles.input} border rounded-xl p-4 pr-12 text-sm outline-none focus:ring-2 focus:ring-blue-500/50 transition-all`} placeholder="Password VNC" value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} /><button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-blue-500">{showPass ? <EyeOff size={18} /> : <Eye size={18} />}</button></div></div>
-            <div className="flex gap-4 pt-4"><button type="button" onClick={onClose} className="flex-1 p-4 rounded-xl font-bold text-slate-500 hover:bg-slate-800 transition-all border border-slate-700">Batal</button><button type="submit" className="flex-[2] bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl p-4 shadow-lg active:scale-95 uppercase text-xs tracking-widest">Simpan Unit</button></div>
-          </form>
+        <h3 className="text-xl font-bold mb-8 flex items-center gap-3 text-blue-500"><div className="p-2 bg-blue-500/10 rounded-lg"><Plus size={20} /></div>Tambah HMI</h3>
+        <form onSubmit={(e) => { e.preventDefault(); onSave(formData); }} className="space-y-6 text-left">
+          <div className="space-y-2"><label className="text-[10px] font-bold opacity-70">Nama Unit</label><input required className={`w-full ${styles.input} border rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-blue-500/50 transition-all`} placeholder="Filling Line 1" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} /></div>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1 space-y-2"><label className="text-[10px] font-bold opacity-70">IP Address</label><input required className={`w-full ${styles.input} border rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-blue-500/50 transition-all`} placeholder="192.168.x.x" value={formData.host} onChange={(e) => setFormData({ ...formData, host: e.target.value })} /></div>
+            <div className="w-full sm:w-32 space-y-2"><label className="text-[10px] font-bold opacity-70">Port Proxy</label><input required className={`w-full ${styles.input} border rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-blue-500/50 transition-all`} value={formData.proxy_port} onChange={(e) => setFormData({ ...formData, proxy_port: e.target.value })} /></div>
+          </div>
+          <div className="space-y-2"><label className="text-[10px] font-bold opacity-70">VNC Password</label><div className="relative"><input type={showPass ? "text" : "password"} className={`w-full ${styles.input} border rounded-xl p-4 pr-12 text-sm outline-none focus:ring-2 focus:ring-blue-500/50 transition-all`} placeholder="Password VNC" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} /><button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-blue-500">{showPass ? <EyeOff size={18} /> : <Eye size={18} />}</button></div></div>
+          <div className="flex gap-4 pt-4"><button type="button" onClick={onClose} className="flex-1 p-4 rounded-xl font-bold text-slate-500 hover:bg-slate-800 transition-all border border-slate-700">Batal</button><button type="submit" className="flex-[2] bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl p-4 shadow-lg active:scale-95 uppercase text-xs tracking-widest">Simpan Unit</button></div>
+        </form>
       </div>
     </div>
   );
@@ -206,7 +206,7 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isPinging, setIsPinging] = useState(false);
   const [error, setError] = useState(null);
-  
+
   // Auth Routing States
   const [token, setToken] = useState(localStorage.getItem('kas_vnc_token'));
   const [username, setUsername] = useState(localStorage.getItem('kas_vnc_user'));
@@ -262,10 +262,10 @@ const App = () => {
           return update ? { ...s, status: update.status } : s;
         }));
       }
-    } catch (err) { 
-      console.error("Status check failed:", err); 
-    } finally { 
-      setIsPinging(false); 
+    } catch (err) {
+      console.error("Status check failed:", err);
+    } finally {
+      setIsPinging(false);
     }
   }, [servers.length, token, authenticatedFetch]);
 
@@ -292,10 +292,10 @@ const App = () => {
           });
         }, 500);
       }
-    } catch (err) { 
-      setError(err.message); 
-    } finally { 
-      setIsLoading(false); 
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
     }
   }, [token, authenticatedFetch]);
 
@@ -350,16 +350,16 @@ const App = () => {
     card: theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200',
   };
 
-  const vncUrl = activeServer ? 
-    `${window.location.origin}/novnc/vnc.html?autoconnect=true&reconnect=true&host=${window.location.hostname}&port=${activeServer.proxy_port}&path=?target=${activeServer.host}:5900&logging=warn&cursor=true&show_dot=true&scale=true&resize=scale${activeServer.password ? `&password=${activeServer.password}` : ''}` 
+  const vncUrl = activeServer ?
+    `${window.location.origin}/novnc/vnc.html?autoconnect=true&reconnect=true&host=${window.location.hostname}&port=${activeServer.proxy_port}&path=?target=${activeServer.host}:5900&logging=warn&cursor=true&show_dot=true&scale=true&resize=scale${activeServer.password ? `&password=${activeServer.password}` : ''}`
     : '';
 
   return (
     <div className={`flex h-screen w-full ${styles.bg} font-sans overflow-hidden transition-colors duration-300`}>
       {isSidebarOpen && <div className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />}
-      
-      <Sidebar 
-        theme={theme} isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} 
+
+      <Sidebar
+        theme={theme} isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen}
         servers={servers} isLoading={isLoading} isPinging={isPinging} error={error}
         searchQuery={searchQuery} setSearchQuery={setSearchQuery}
         activeServer={activeServer} setActiveServer={setActiveServer}
@@ -371,13 +371,13 @@ const App = () => {
       <main className="flex-1 flex flex-col relative min-w-0 h-full overflow-hidden">
         <header className={`h-16 ${styles.header} border-b flex items-center justify-between px-4 md:px-6 z-30 backdrop-blur-md`}>
           <div className="flex items-center gap-4 min-w-0">
-            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className={`p-2 rounded-lg transition-colors ${!isSidebarOpen ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500'}`}>{isSidebarOpen ? <PanelLeftClose size={20}/> : <PanelLeftOpen size={20}/>}</button>
+            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className={`p-2 rounded-lg transition-colors ${!isSidebarOpen ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500'}`}>{isSidebarOpen ? <PanelLeftClose size={20} /> : <PanelLeftOpen size={20} />}</button>
             <div className="flex flex-col min-w-0">
               {activeServer ? (
                 <div className="animate-in fade-in slide-in-from-left-2">
                   <div className="flex items-center gap-2">
                     <h2 className="text-sm font-bold truncate">{activeServer.name}</h2>
-                    <div className={`w-1.5 h-1.5 rounded-full ${activeServer.status === 'online' ? 'bg-emerald-500' : 'bg-rose-500'}`}/>
+                    <div className={`w-1.5 h-1.5 rounded-full ${activeServer.status === 'online' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                   </div>
                   <p className="text-[10px] text-slate-500 truncate">{activeServer.host} • PT KIAS</p>
                 </div>
@@ -386,10 +386,10 @@ const App = () => {
               )}
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2 shrink-0">
-             <div className={`flex items-center gap-1 ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-200'} p-1 rounded-full`}><button onClick={() => setTheme('light')} className={`p-1.5 rounded-full ${theme === 'light' ? 'bg-white text-orange-500 shadow-sm' : 'text-slate-500'}`}><Sun size={14}/></button><button onClick={() => setTheme('dark')} className={`p-1.5 rounded-full ${theme === 'dark' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400'}`}><Moon size={14}/></button></div>
-            {activeServer && <div className="flex items-center gap-1 md:gap-2 border-l pl-2 md:pl-4 border-slate-700/50"><button className="hidden sm:flex p-2 text-slate-400 hover:text-blue-500"><Keyboard size={16}/></button><button onClick={() => document.querySelector('iframe')?.requestFullscreen()} className="p-2 text-slate-400 hover:text-blue-500"><Maximize2 size={16}/></button><button onClick={() => setConnectionKey(k => k + 1)} className="p-2 text-slate-400 hover:text-blue-500"><RefreshCw size={16}/></button><button onClick={() => setActiveServer(null)} className="bg-rose-600 text-white text-[10px] font-bold py-2 px-3 rounded-lg ml-1">Disconnect</button></div>}
+            <div className={`flex items-center gap-1 ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-200'} p-1 rounded-full`}><button onClick={() => setTheme('light')} className={`p-1.5 rounded-full ${theme === 'light' ? 'bg-white text-orange-500 shadow-sm' : 'text-slate-500'}`}><Sun size={14} /></button><button onClick={() => setTheme('dark')} className={`p-1.5 rounded-full ${theme === 'dark' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400'}`}><Moon size={14} /></button></div>
+            {activeServer && <div className="flex items-center gap-1 md:gap-2 border-l pl-2 md:pl-4 border-slate-700/50"><button className="hidden sm:flex p-2 text-slate-400 hover:text-blue-500"><Keyboard size={16} /></button><button onClick={() => document.querySelector('iframe')?.requestFullscreen()} className="p-2 text-slate-400 hover:text-blue-500"><Maximize2 size={16} /></button><button onClick={() => setConnectionKey(k => k + 1)} className="p-2 text-slate-400 hover:text-blue-500"><RefreshCw size={16} /></button><button onClick={() => setActiveServer(null)} className="bg-rose-600 text-white text-[10px] font-bold py-2 px-3 rounded-lg ml-1">Disconnect</button></div>}
           </div>
         </header>
 
@@ -414,11 +414,11 @@ const App = () => {
         </div>
       </main>
 
-      <AddServerModal 
-        theme={theme} 
-        isOpen={isAddModalOpen} 
-        onClose={() => setIsAddModalOpen(false)} 
-        onSave={saveNewServer} 
+      <AddServerModal
+        theme={theme}
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSave={saveNewServer}
       />
     </div>
   );

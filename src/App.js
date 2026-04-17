@@ -208,8 +208,8 @@ const App = () => {
   const [error, setError] = useState(null);
 
   // Auth Routing States
-  const [token, setToken] = useState(localStorage.getItem('kas_vnc_token'));
-  const [username, setUsername] = useState(localStorage.getItem('kas_vnc_user'));
+  const [token, setToken] = useState(localStorage.getItem('kias_vnc_token'));
+  const [username, setUsername] = useState(localStorage.getItem('kias_vnc_user'));
 
   // Dashboard States
   const [activeServer, setActiveServer] = useState(null);
@@ -219,8 +219,8 @@ const App = () => {
 
   // --- LOGIKA AUTH ---
   const handleLogout = useCallback(() => {
-    localStorage.removeItem('kas_vnc_token');
-    localStorage.removeItem('kas_vnc_user');
+    localStorage.removeItem('kias_vnc_token');
+    localStorage.removeItem('kias_vnc_user');
     setToken(null);
     setUsername(null);
     setServers([]);
@@ -228,8 +228,8 @@ const App = () => {
   }, []);
 
   const handleLoginSuccess = (newToken, newUser) => {
-    localStorage.setItem('kas_vnc_token', newToken);
-    localStorage.setItem('kas_vnc_user', newUser);
+    localStorage.setItem('kias_vnc_token', newToken);
+    localStorage.setItem('kias_vnc_user', newUser);
     setToken(newToken);
     setUsername(newUser);
   };

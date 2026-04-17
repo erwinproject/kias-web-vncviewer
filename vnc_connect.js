@@ -19,7 +19,7 @@ wss.on('connection', (ws, req) => {
     const [targetIp, targetPort] = target.split(':');
     console.log(`Menerima permintaan proxy ke -> ${targetIp}:${targetPort || 5900}`);
 
-    const vnc = new net.Socket();
+    const vnc = new net.Socket(); 
     
     // Hubungkan ke VNC target secara dinamis
     vnc.connect(targetPort || 5900, targetIp, () => {
